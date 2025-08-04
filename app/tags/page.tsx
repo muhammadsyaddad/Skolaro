@@ -1,15 +1,23 @@
+// app/tags/page.tsx
+
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import { slug } from 'github-slugger'
-import tagData from 'app/tag-data.json'
-import { genPageMetadata } from 'app/seo'
+import { getAllTagsWithCounts } from '@/lib/db/data' // Ambil data dari database
+import { Metadata } from 'next'
+import siteMetadata from '@/data/siteMetadata'
 
-export const metadata = genPageMetadata({ title: 'Tags', description: 'Things I blog about' })
+// SEO untuk halaman
+export const metadata: Metadata = {
+  title: 'Tags',
+  description: `Telusuri beasiswa berdasarkan kategori dan tag di ${siteMetadata.title}`,
+}
 
-export default async function Page() {
-  const tagCounts = tagData as Record<string, number>
-  const tagKeys = Object.keys(tagCounts)
-  const sortedTags = tagKeys.sort((a, b) => tagCounts[b] - tagCounts[a])
+export default async function TagsPage() {
+  // Ambil data tags dari Supabase
+  const tags = await getAllTagsWithCounts()
+  const sortedTags = Object.keys(tags).sort((a, b) => tags[b] - tags[a])
+
   return (
     <>
       <div className="flex flex-col items-start justify-start divide-y divide-gray-200 md:mt-24 md:flex-row md:items-center md:justify-center md:space-x-6 md:divide-y-0 dark:divide-gray-700">
@@ -19,7 +27,7 @@ export default async function Page() {
           </h1>
         </div>
         <div className="flex max-w-lg flex-wrap">
-          {tagKeys.length === 0 && 'No tags found.'}
+          {sortedTags.length === 0 && 'No tags found.'}
           {sortedTags.map((t) => {
             return (
               <div key={t} className="mt-2 mr-5 mb-2">
@@ -27,9 +35,9 @@ export default async function Page() {
                 <Link
                   href={`/tags/${slug(t)}`}
                   className="-ml-2 text-sm font-semibold text-gray-600 uppercase dark:text-gray-300"
-                  aria-label={`View posts tagged ${t}`}
+                  aria-label={`Lihat beasiswa dengan tag ${t}`}
                 >
-                  {` (${tagCounts[t]})`}
+                  {` (${tags[t]})`}
                 </Link>
               </div>
             )

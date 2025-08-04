@@ -1,9 +1,10 @@
-import { sortPosts, allCoreContent } from 'pliny/utils/contentlayer'
-import { allBlogs } from 'contentlayer/generated'
+import { getBeasiswa } from '@/lib/db/data'
 import Main from './Main'
 
 export default async function Page() {
-  const sortedPosts = sortPosts(allBlogs)
-  const posts = allCoreContent(sortedPosts)
-  return <Main posts={posts} />
+  // Ambil data halaman pertama dari fungsi yang kita buat
+  const { data: beasiswa } = await getBeasiswa(1)
+
+  // Kirim data tersebut ke komponen Main melalui prop 'beasiswa'
+  return <Main beasiswa={beasiswa} />
 }

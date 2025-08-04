@@ -1,4 +1,5 @@
-export interface BeasiswaInfo {
+// lib/db/constants.ts
+export interface Beasiswa {
   url: string
   judul: string
   deadline: string | null
@@ -8,4 +9,11 @@ export interface BeasiswaInfo {
   tags: string[]
   kampus: string[]
   link_pendaftaran: string | null
+}
+
+// Tipe untuk props halaman detail
+export interface BeasiswaDetailPageProps {
+  params: {
+    url: string
+  }
 }

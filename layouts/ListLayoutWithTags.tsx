@@ -1,34 +1,33 @@
+// layouts/ListLayoutWithTags.tsx
 'use client'
 
 import { usePathname } from 'next/navigation'
 import { slug } from 'github-slugger'
 import { formatDate } from 'pliny/utils/formatDate'
-import { CoreContent } from 'pliny/utils/contentlayer'
-import type { Blog } from 'contentlayer/generated'
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
-import tagData from 'app/tag-data.json'
+import type { Beasiswa } from '@/lib/db/constants' // <-- Impor tipe data Beasiswa
 
+// Props untuk komponen Pagination (tidak berubah)
 interface PaginationProps {
   totalPages: number
   currentPage: number
 }
+
+// ✅ 1. UBAH PROPS AGAR MENERIMA DATA BEASISWA DAN TAGS DINAMIS
 interface ListLayoutProps {
-  posts: CoreContent<Blog>[]
+  posts: Beasiswa[] // Terima array Beasiswa
   title: string
-  initialDisplayPosts?: CoreContent<Blog>[]
+  initialDisplayPosts?: Beasiswa[]
   pagination?: PaginationProps
+  tags: Record<string, number> // Terima objek tags dari database
 }
 
 function Pagination({ totalPages, currentPage }: PaginationProps) {
   const pathname = usePathname()
-  const segments = pathname.split('/')
-  const lastSegment = segments[segments.length - 1]
-  const basePath = pathname
-    .replace(/^\//, '') // Remove leading slash
-    .replace(/\/page\/\d+\/?$/, '') // Remove any trailing /page
-    .replace(/\/$/, '') // Remove trailing slash
+  const basePath = pathname.split('/page/')[0].replace(/\/$/, '') // Dapatkan path dasar, mis: /beasiswa
+
   const prevPage = currentPage - 1 > 0
   const nextPage = currentPage + 1 <= totalPages
 
@@ -42,7 +41,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
         )}
         {prevPage && (
           <Link
-            href={currentPage - 1 === 1 ? `/${basePath}/` : `/${basePath}/page/${currentPage - 1}`}
+            href={currentPage - 1 === 1 ? `${basePath}` : `${basePath}/page/${currentPage - 1}`}
             rel="prev"
           >
             Previous
@@ -57,7 +56,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
           </button>
         )}
         {nextPage && (
-          <Link href={`/${basePath}/page/${currentPage + 1}`} rel="next">
+          <Link href={`${basePath}/page/${currentPage + 1}`} rel="next">
             Next
           </Link>
         )}
@@ -71,9 +70,12 @@ export default function ListLayoutWithTags({
   title,
   initialDisplayPosts = [],
   pagination,
+  tags, // ✅ 2. Gunakan tags dari props
 }: ListLayoutProps) {
   const pathname = usePathname()
-  const tagCounts = tagData as Record<string, number>
+
+  // ✅ 3. Hapus `import tagData` dan gunakan `tags` dari props
+  const tagCounts = tags
   const tagKeys = Object.keys(tagCounts)
   const sortedTags = tagKeys.sort((a, b) => tagCounts[b] - tagCounts[a])
 
@@ -88,31 +90,24 @@ export default function ListLayoutWithTags({
           </h1>
         </div>
         <div className="flex sm:space-x-24">
-          <div className="hidden h-full max-h-screen max-w-[280px] min-w-[280px] flex-wrap overflow-auto rounded-sm bg-gray-50 pt-5 shadow-md sm:flex dark:bg-gray-900/70 dark:shadow-gray-800/40">
+          <div className="hidden h-full max-h-screen min-w-[280px] flex-wrap overflow-auto rounded-sm bg-gray-50 pt-5 shadow-md sm:flex dark:bg-gray-900/70 dark:shadow-gray-800/40">
             <div className="px-6 py-4">
-              {pathname.startsWith('/blog') ? (
-                <h3 className="text-primary-500 font-bold uppercase">All Posts</h3>
-              ) : (
-                <Link
-                  href={`/blog`}
-                  className="hover:text-primary-500 dark:hover:text-primary-500 font-bold text-gray-700 uppercase dark:text-gray-300"
-                >
-                  All Posts
-                </Link>
-              )}
+              {/* ✅ 4. SESUAIKAN LOGIKA UNTUK HALAMAN BEASISWA */}
+              <h3 className="text-primary-500 font-bold uppercase">Semua Beasiswa</h3>
               <ul>
                 {sortedTags.map((t) => {
                   return (
                     <li key={t} className="my-3">
+                      {/* Cek apakah tag saat ini sedang aktif */}
                       {decodeURI(pathname.split('/tags/')[1]) === slug(t) ? (
                         <h3 className="text-primary-500 inline px-3 py-2 text-sm font-bold uppercase">
                           {`${t} (${tagCounts[t]})`}
                         </h3>
                       ) : (
                         <Link
-                          href={`/tags/${slug(t)}`}
+                          href={`/tags/${slug(t)}`} // Link ini nanti bisa kita buat halamannya
                           className="hover:text-primary-500 dark:hover:text-primary-500 px-3 py-2 text-sm font-medium text-gray-500 uppercase dark:text-gray-300"
-                          aria-label={`View posts tagged ${t}`}
+                          aria-label={`Lihat beasiswa dengan tag ${t}`}
                         >
                           {`${t} (${tagCounts[t]})`}
                         </Link>
@@ -126,12 +121,13 @@ export default function ListLayoutWithTags({
           <div>
             <ul>
               {displayPosts.map((post) => {
+                // ✅ 5. AMBIL PROPERTI DARI DATA BEASISWA YANG SUDAH DIFORMAT
                 const { path, date, title, summary, tags } = post
                 return (
                   <li key={path} className="py-5">
                     <article className="flex flex-col space-y-2 xl:space-y-0">
                       <dl>
-                        <dt className="sr-only">Published on</dt>
+                        <dt className="sr-only">Deadline</dt>
                         <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400">
                           <time dateTime={date} suppressHydrationWarning>
                             {formatDate(date, siteMetadata.locale)}
@@ -141,7 +137,8 @@ export default function ListLayoutWithTags({
                       <div className="space-y-3">
                         <div>
                           <h2 className="text-2xl leading-8 font-bold tracking-tight">
-                            <Link href={`/${path}`} className="text-gray-900 dark:text-gray-100">
+                            {/* Pastikan link menggunakan 'path' yang sudah kita buat */}
+                            <Link href={path} className="text-gray-900 dark:text-gray-100">
                               {title}
                             </Link>
                           </h2>

@@ -1,59 +1,63 @@
+// app/tags/[tag]/page.tsx
+
 import { slug } from 'github-slugger'
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
-import siteMetadata from '@/data/siteMetadata'
-import ListLayout from '@/layouts/ListLayoutWithTags'
-import { allBlogs } from 'contentlayer/generated'
-import tagData from 'app/tag-data.json'
-import { genPageMetadata } from 'app/seo'
+import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 
-const POSTS_PER_PAGE = 5
+import ListLayoutWithTags from '@/layouts/ListLayoutWithTags'
+import { getAllTagsWithCounts, getBeasiswaByTag } from '@/lib/db/data'
+import { coreContent } from 'pliny/utils/contentlayer'
 
-export async function generateMetadata(props: {
-  params: Promise<{ tag: string }>
-}): Promise<Metadata> {
-  const params = await props.params
-  const tag = decodeURI(params.tag)
-  return genPageMetadata({
-    title: tag,
-    description: `${siteMetadata.title} ${tag} tagged content`,
-    alternates: {
-      canonical: './',
-      types: {
-        'application/rss+xml': `${siteMetadata.siteUrl}/tags/${tag}/feed.xml`,
-      },
-    },
-  })
+// Props untuk halaman ini
+interface TagPageProps {
+  params: {
+    tag: string
+  }
 }
 
-export const generateStaticParams = async () => {
-  const tagCounts = tagData as Record<string, number>
-  const tagKeys = Object.keys(tagCounts)
-  return tagKeys.map((tag) => ({
-    tag: encodeURI(tag),
-  }))
+// Fungsi untuk SEO
+export async function generateMetadata({ params }: TagPageProps): Promise<Metadata> {
+  const tag = decodeURI(params.tag)
+  return {
+    title: `Beasiswa dengan tag: ${tag}`,
+    description: `Daftar beasiswa yang tersedia dengan tag ${tag}`,
+  }
 }
 
-export default async function TagPage(props: { params: Promise<{ tag: string }> }) {
-  const params = await props.params
-  const tag = decodeURI(params.tag)
-  const title = tag[0].toUpperCase() + tag.split(' ').join('-').slice(1)
-  const filteredPosts = allCoreContent(
-    sortPosts(allBlogs.filter((post) => post.tags && post.tags.map((t) => slug(t)).includes(tag)))
-  )
-  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE)
-  const initialDisplayPosts = filteredPosts.slice(0, POSTS_PER_PAGE)
-  const pagination = {
-    currentPage: 1,
-    totalPages: totalPages,
+// Komponen Halaman
+export default async function TagPage({ params }: TagPageProps) {
+  const tagSlug = decodeURI(params.tag)
+  const allTags = await getAllTagsWithCounts()
+
+  // Cari tag asli dari slug (mis: "s-1" -> "S1")
+  const originalTag = Object.keys(allTags).find((t) => slug(t) === tagSlug)
+  if (!originalTag) {
+    return notFound()
   }
 
+  // Ambil data beasiswa berdasarkan tag
+  const { data: beasiswaList } = await getBeasiswaByTag(originalTag)
+
+  // Transformasi data agar sesuai dengan layout
+  const formattedBeasiswa = beasiswaList.map((item) => ({
+    ...item,
+    title: item.judul,
+    date: item.deadline || new Date().toISOString(),
+    summary: item.deskripsi.length > 0 ? `${item.deskripsi[0]}...` : 'Klik untuk detail.',
+    slug: item.url,
+    path: `/beasiswa/${encodeURIComponent(item.url)}`,
+    tags: item.tags || [],
+  }))
+
+  const displayPosts = formattedBeasiswa.map((post) => coreContent(post as any))
+
   return (
-    <ListLayout
-      posts={filteredPosts}
-      initialDisplayPosts={initialDisplayPosts}
-      pagination={pagination}
-      title={title}
+    <ListLayoutWithTags
+      posts={displayPosts as any}
+      title={`Beasiswa dengan Tag: "${originalTag}"`}
+      initialDisplayPosts={displayPosts as any}
+      tags={allTags}
+      // Pagination bisa ditambahkan di sini nanti jika diperlukan
     />
   )
 }
