@@ -9,7 +9,7 @@ export function createBeasiswaCrawler(config: ScraperConfig, sourceName: string)
   return new PlaywrightCrawler({
     maxRequestsPerCrawl: config.maxRequestsPerCrawl ?? 300,
     navigationTimeoutSecs: 120000, // Tambahkan timeout yang lebih lama
-    async requestHandler({ page, parseWithCheerio, request, enqueueLinks }) {
+    async requestHandler({ page, parseWithCheerio, request, enqueueLinks }: any) {
       try {
         console.log(`[${sourceName}] 🤖 Mengunjungi: ${request.url}`)
         await page.waitForSelector(config.contentSelector, { timeout: 30000 })
@@ -36,7 +36,7 @@ export function createBeasiswaCrawler(config: ScraperConfig, sourceName: string)
           kampus: [],
         }
 
-        const specificData = config.extractData($, content)
+        const specificData = config.extractData($ as any, content as any)
         Object.assign(info, specificData)
 
         // --- Logika Penyimpanan Diubah ke Supabase ---

@@ -1,5 +1,25 @@
-import type { Cheerio, CheerioAPI } from 'cheerio'
 import { Beasiswa } from '@/lib/db/constant'
+
+// Custom interfaces to avoid cheerio type conflicts
+interface CheerioElement {
+  [key: string]: any
+}
+
+interface CheerioSelection {
+  find: (selector: string) => CheerioSelection
+  text: () => string
+  attr: (name: string) => string | undefined
+  map: (fn: (index: number, element: any) => any) => CheerioSelection
+  get: () => any[]
+  first: () => CheerioSelection
+  each: (fn: (index: number, element: any) => void) => CheerioSelection
+  [key: string]: any
+}
+
+interface CustomCheerioAPI {
+  (selector: string): CheerioSelection
+  [key: string]: any
+}
 
 // Interface untuk mendefinisikan "resep" scraper
 export interface ScraperConfig {
@@ -11,7 +31,7 @@ export interface ScraperConfig {
   tagsSelector: string
   maxRequestsPerCrawl?: number
   // Diubah agar menerima 'content' untuk pencarian yang lebih efisien
-  extractData: ($: CheerioAPI, content: Cheerio<any>) => Partial<Beasiswa>
+  extractData: ($: CustomCheerioAPI, content: CheerioSelection) => Partial<Beasiswa>
 }
 
 // Konfigurasi untuk situs pertama (indbeasiswa.com)

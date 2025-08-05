@@ -5423,7 +5423,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheerio@npm:*, cheerio@npm:^1.1.2":
+"cheerio@npm:*":
   version: 1.1.2
   resolution: "cheerio@npm:1.1.2"
   dependencies:
@@ -7851,7 +7851,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gray-matter@npm:^4.0.2, gray-matter@npm:^4.0.3":
+"gray-matter@npm:^4.0.3":
   version: 4.0.3
   resolution: "gray-matter@npm:4.0.3"
   dependencies:
@@ -8461,15 +8461,6 @@ __metadata:
   version: 5.3.2
   resolution: "ignore@npm:5.3.2"
   checksum: 2acfd32a573260ea522ea0bfeff880af426d68f6831f973129e2ba7363f422923cf53aab62f8369cbf4667c7b25b6f8a3761b34ecdb284ea18e87a5262a865be
-  languageName: node
-  linkType: hard
-
-"image-size@npm:2.0.1":
-  version: 2.0.1
-  resolution: "image-size@npm:2.0.1"
-  bin:
-    image-size: bin/image-size.js
-  checksum: 1057c58f5b17fddb17c4b1d43e28a9574dfc231411c42b9eca2dcb2b96fa2c19e3ef933b281ce9b549cac42f6fc1ea356481e939bf63655fd9d757781456c1ef
   languageName: node
   linkType: hard
 
@@ -13644,7 +13635,6 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^8.12.0
     "@typescript-eslint/parser": ^8.12.0
     body-scroll-lock: ^4.0.0-beta.0
-    cheerio: ^1.1.2
     contentlayer2: 0.5.5
     crawlee: ^3.14.0
     cross-env: ^7.0.3
@@ -13656,10 +13646,8 @@ __metadata:
     eslint-plugin-prettier: ^5.2.0
     github-slugger: ^2.0.0
     globals: ^15.12.0
-    gray-matter: ^4.0.2
     hast-util-from-html-isomorphic: ^2.0.0
     husky: ^9.0.0
-    image-size: 2.0.1
     lint-staged: ^13.0.0
     next: 15.2.4
     next-contentlayer2: 0.5.5
