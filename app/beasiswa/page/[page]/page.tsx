@@ -2,18 +2,26 @@
 
 import ListLayoutWithTags from '@/layouts/ListLayoutWithTags'
 import { getBeasiswa, BEASISWA_PER_HALAMAN, getAllTagsWithCounts } from '@/lib/db/data' // <-- Tambahkan getAllTagsWithCounts
-import { coreContent } from 'pliny/utils/contentlayer'
+import type { Beasiswa } from '@/lib/db/constant'
 
 const JUDUL_HALAMAN = 'Semua Beasiswa'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     page: string
-  }
+  }>
+}
+
+interface TransformedBeasiswa extends Beasiswa {
+  title: string
+  date: string
+  summary: string
+  path: string
 }
 
 export default async function BeasiswaPageNumber({ params }: PageProps) {
-  const pageNumber = parseInt(params.page, 10)
+  const { page } = await params
+  const pageNumber = parseInt(page, 10)
 
   // ✅ Ambil data beasiswa DAN data tags secara bersamaan
   const tags = await getAllTagsWithCounts()
@@ -26,7 +34,7 @@ export default async function BeasiswaPageNumber({ params }: PageProps) {
   }
 
   // Transformasi data (tidak berubah)
-  const formattedBeasiswa = beasiswaList.map((item) => ({
+  const formattedBeasiswa: TransformedBeasiswa[] = beasiswaList.map((item) => ({
     ...item,
     title: item.judul,
     date: item.deadline || new Date().toISOString(),
@@ -36,13 +44,13 @@ export default async function BeasiswaPageNumber({ params }: PageProps) {
     tags: item.tags || [],
   }))
 
-  const displayPosts = formattedBeasiswa.map((post) => coreContent(post as any))
+  const displayPosts = formattedBeasiswa
 
   return (
     <ListLayoutWithTags
-      posts={displayPosts as any}
+      posts={displayPosts}
       title={JUDUL_HALAMAN}
-      initialDisplayPosts={displayPosts as any}
+      initialDisplayPosts={displayPosts}
       pagination={pagination}
       tags={tags} // ✅ Pastikan 'tags' diteruskan ke layout
     />

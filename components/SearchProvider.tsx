@@ -2,8 +2,20 @@
 
 import { KBarSearchProvider } from 'pliny/search/KBar'
 import { useRouter } from 'next/navigation'
+import { ReactNode } from 'react'
 
-export const SearchProvider = ({ children }) => {
+interface SearchItem {
+  path: string
+  title: string
+  summary?: string
+  tags: string[]
+}
+
+interface SearchProviderProps {
+  children: ReactNode
+}
+
+export const SearchProvider = ({ children }: SearchProviderProps) => {
   const router = useRouter()
 
   return (
@@ -14,7 +26,7 @@ export const SearchProvider = ({ children }) => {
         // ✅ onSearchDocumentsLoad akan mengubah format JSON dari API kita
         // agar bisa dibaca oleh KBar.
         onSearchDocumentsLoad(json) {
-          return json.map((item: any) => ({
+          return json.map((item: SearchItem) => ({
             id: item.path,
             name: item.title,
             keywords: item.summary || '',

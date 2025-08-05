@@ -2,7 +2,7 @@ import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import { formatDate } from 'pliny/utils/formatDate'
-import type { Beasiswa } from '@/lib/db/constants'
+import type { Beasiswa } from '@/lib/db/constant'
 
 const MAX_DISPLAY = 5 // Kita hanya akan menampilkan 5 item di halaman utama
 

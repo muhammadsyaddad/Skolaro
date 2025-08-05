@@ -1,53 +1,75 @@
 import { slug } from 'github-slugger'
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
-import ListLayout from '@/layouts/ListLayoutWithTags'
-import { allBlogs } from 'contentlayer/generated'
-import tagData from 'app/tag-data.json'
 import { notFound } from 'next/navigation'
+import ListLayoutWithTags from '@/layouts/ListLayoutWithTags'
+import { getAllTagsWithCounts, getBeasiswaByTag } from '@/lib/db/data'
 
-const POSTS_PER_PAGE = 5
+import type { Beasiswa } from '@/lib/db/constant'
 
-export const generateStaticParams = async () => {
-  const tagCounts = tagData as Record<string, number>
-  return Object.keys(tagCounts).flatMap((tag) => {
-    const postCount = tagCounts[tag]
-    const totalPages = Math.max(1, Math.ceil(postCount / POSTS_PER_PAGE))
-    return Array.from({ length: totalPages }, (_, i) => ({
-      tag: encodeURI(tag),
-      page: (i + 1).toString(),
-    }))
-  })
+const BEASISWA_PER_HALAMAN = 5
+
+interface TransformedBeasiswa extends Beasiswa {
+  title: string
+  date: string
+  summary: string
+  path: string
 }
 
 export default async function TagPage(props: { params: Promise<{ tag: string; page: string }> }) {
   const params = await props.params
   const tag = decodeURI(params.tag)
-  const title = tag[0].toUpperCase() + tag.split(' ').join('-').slice(1)
-  const pageNumber = parseInt(params.page)
-  const filteredPosts = allCoreContent(
-    sortPosts(allBlogs.filter((post) => post.tags && post.tags.map((t) => slug(t)).includes(tag)))
-  )
-  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE)
+  const pageNumber = parseInt(params.page, 10)
+
+  const allTags = await getAllTagsWithCounts()
+
+  // Cari tag asli dari slug (mis: "s-1" -> "S1")
+  const originalTag = Object.keys(allTags).find((t) => slug(t) === tag)
+  if (!originalTag) {
+    return notFound()
+  }
+
+  // Ambil data beasiswa berdasarkan tag
+  const { data: beasiswaList } = await getBeasiswaByTag(originalTag)
+
+  const totalPages = Math.ceil(beasiswaList.length / BEASISWA_PER_HALAMAN)
 
   // Return 404 for invalid page numbers or empty pages
   if (pageNumber <= 0 || pageNumber > totalPages || isNaN(pageNumber)) {
     return notFound()
   }
-  const initialDisplayPosts = filteredPosts.slice(
-    POSTS_PER_PAGE * (pageNumber - 1),
-    POSTS_PER_PAGE * pageNumber
+
+  // Transformasi data agar sesuai dengan layout
+  const formattedBeasiswa: TransformedBeasiswa[] = beasiswaList.map((item) => ({
+    ...item,
+    title: item.judul,
+    date: item.deadline || new Date().toISOString(),
+    summary: item.deskripsi.length > 0 ? `${item.deskripsi[0]}...` : 'Klik untuk detail.',
+    slug: item.url,
+    path: `/beasiswa/${encodeURIComponent(item.url)}`,
+    tags: item.tags || [],
+  }))
+
+  const displayPosts = formattedBeasiswa
+
+  // Pagination
+  const initialDisplayPosts = displayPosts.slice(
+    BEASISWA_PER_HALAMAN * (pageNumber - 1),
+    BEASISWA_PER_HALAMAN * pageNumber
   )
+
   const pagination = {
     currentPage: pageNumber,
     totalPages: totalPages,
   }
 
+  const title = originalTag[0].toUpperCase() + originalTag.slice(1)
+
   return (
-    <ListLayout
-      posts={filteredPosts}
+    <ListLayoutWithTags
+      posts={displayPosts}
+      title={`Beasiswa dengan Tag: "${title}"`}
       initialDisplayPosts={initialDisplayPosts}
       pagination={pagination}
-      title={title}
+      tags={allTags}
     />
   )
 }

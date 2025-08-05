@@ -1,6 +1,6 @@
 // lib/db/data.ts
 import { supabase } from './supabaseClient'
-import type { Beasiswa } from './constants' // Asumsi tipe ada di constants
+import type { Beasiswa } from './constant' // Asumsi tipe ada di constant
 
 // Tentukan berapa item yang akan ditampilkan per halaman
 export const BEASISWA_PER_HALAMAN = 5

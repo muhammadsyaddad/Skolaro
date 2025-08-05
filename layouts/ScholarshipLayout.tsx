@@ -3,7 +3,7 @@ import SectionContainer from '@/components/SectionContainer'
 import siteMetadata from '@/data/siteMetadata'
 import Tag from '@/components/Tag'
 import Link from '@/components/Link'
-import type { Beasiswa } from '@/lib/db/constants'
+import type { Beasiswa } from '@/lib/db/constant'
 import { formatDate } from 'pliny/utils/formatDate'
 
 interface LayoutProps {

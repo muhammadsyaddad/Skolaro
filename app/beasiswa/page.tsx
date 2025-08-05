@@ -1,10 +1,17 @@
 // app/beasiswa/page.tsx
 
-import { BEASISWA_PER_HALAMAN, getAllTagsWithCounts, getBeasiswa } from '@/lib/db/data'
 import ListLayoutWithTags from '@/layouts/ListLayoutWithTags'
-import { coreContent } from 'pliny/utils/contentlayer'
+import { getBeasiswa, getAllTagsWithCounts, BEASISWA_PER_HALAMAN } from '@/lib/db/data'
+import type { Beasiswa } from '@/lib/db/constant'
 
 const JUDUL_HALAMAN = 'Semua Beasiswa'
+
+interface TransformedBeasiswa extends Beasiswa {
+  title: string
+  date: string
+  summary: string
+  path: string
+}
 
 export default async function BeasiswaPage() {
   // 1. Ambil data tags dan data beasiswa halaman pertama secara bersamaan
@@ -18,7 +25,7 @@ export default async function BeasiswaPage() {
   }
 
   // 2. Transformasi data beasiswa (seperti sebelumnya)
-  const formattedBeasiswa = beasiswaList.map((item) => ({
+  const formattedBeasiswa: TransformedBeasiswa[] = beasiswaList.map((item) => ({
     ...item,
     title: item.judul,
     date: item.deadline || new Date().toISOString(),
@@ -28,14 +35,14 @@ export default async function BeasiswaPage() {
     tags: item.tags || [],
   }))
 
-  const displayPosts = formattedBeasiswa.map((post) => coreContent(post as any))
+  const displayPosts = formattedBeasiswa
 
   // 3. Gunakan ListLayoutWithTags dan berikan semua data yang dibutuhkan
   return (
     <ListLayoutWithTags
-      posts={displayPosts as any}
+      posts={displayPosts}
       title={JUDUL_HALAMAN}
-      initialDisplayPosts={displayPosts as any}
+      initialDisplayPosts={displayPosts}
       pagination={pagination}
       tags={tags}
     />

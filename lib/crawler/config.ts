@@ -1,5 +1,5 @@
 import type { Cheerio, CheerioAPI } from 'cheerio'
-import { BeasiswaInfo } from '../constant.js'
+import { Beasiswa } from '@/lib/db/constant'
 
 // Interface untuk mendefinisikan "resep" scraper
 export interface ScraperConfig {
@@ -11,7 +11,7 @@ export interface ScraperConfig {
   tagsSelector: string
   maxRequestsPerCrawl?: number
   // Diubah agar menerima 'content' untuk pencarian yang lebih efisien
-  extractData: ($: CheerioAPI, content: Cheerio<any>) => Partial<BeasiswaInfo>
+  extractData: ($: CheerioAPI, content: Cheerio<any>) => Partial<Beasiswa>
 }
 
 // Konfigurasi untuk situs pertama (indbeasiswa.com)
@@ -25,7 +25,7 @@ export const indbeasiswaConfig: ScraperConfig = {
   tagsSelector: 'span.post-category a',
   extractData: ($, content) => {
     // 'content' sekarang diterima
-    const info: Partial<BeasiswaInfo> = {
+    const info: Partial<Beasiswa> = {
       persyaratan: [],
       benefit: [],
       kampus: [],
@@ -59,7 +59,7 @@ export const beasiswakitaConfig: ScraperConfig = {
   tagsSelector: ".breadcrumb-bwrap a[rel='tag']",
   extractData: ($, content) => {
     // 'content' sekarang diterima
-    const info: Partial<BeasiswaInfo> = {
+    const info: Partial<Beasiswa> = {
       persyaratan: [],
       benefit: [],
       deadline: null,

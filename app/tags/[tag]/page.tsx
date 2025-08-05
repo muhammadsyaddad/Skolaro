@@ -6,27 +6,37 @@ import { Metadata } from 'next'
 
 import ListLayoutWithTags from '@/layouts/ListLayoutWithTags'
 import { getAllTagsWithCounts, getBeasiswaByTag } from '@/lib/db/data'
-import { coreContent } from 'pliny/utils/contentlayer'
+
+import type { Beasiswa } from '@/lib/db/constant'
 
 // Props untuk halaman ini
 interface TagPageProps {
-  params: {
+  params: Promise<{
     tag: string
-  }
+  }>
+}
+
+interface TransformedBeasiswa extends Beasiswa {
+  title: string
+  date: string
+  summary: string
+  path: string
 }
 
 // Fungsi untuk SEO
 export async function generateMetadata({ params }: TagPageProps): Promise<Metadata> {
-  const tag = decodeURI(params.tag)
+  const { tag } = await params
+  const tagName = decodeURI(tag)
   return {
-    title: `Beasiswa dengan tag: ${tag}`,
-    description: `Daftar beasiswa yang tersedia dengan tag ${tag}`,
+    title: `Beasiswa dengan tag: ${tagName}`,
+    description: `Daftar beasiswa yang tersedia dengan tag ${tagName}`,
   }
 }
 
 // Komponen Halaman
 export default async function TagPage({ params }: TagPageProps) {
-  const tagSlug = decodeURI(params.tag)
+  const { tag } = await params
+  const tagSlug = decodeURI(tag)
   const allTags = await getAllTagsWithCounts()
 
   // Cari tag asli dari slug (mis: "s-1" -> "S1")
@@ -39,7 +49,7 @@ export default async function TagPage({ params }: TagPageProps) {
   const { data: beasiswaList } = await getBeasiswaByTag(originalTag)
 
   // Transformasi data agar sesuai dengan layout
-  const formattedBeasiswa = beasiswaList.map((item) => ({
+  const formattedBeasiswa: TransformedBeasiswa[] = beasiswaList.map((item) => ({
     ...item,
     title: item.judul,
     date: item.deadline || new Date().toISOString(),
@@ -49,13 +59,13 @@ export default async function TagPage({ params }: TagPageProps) {
     tags: item.tags || [],
   }))
 
-  const displayPosts = formattedBeasiswa.map((post) => coreContent(post as any))
+  const displayPosts = formattedBeasiswa
 
   return (
     <ListLayoutWithTags
-      posts={displayPosts as any}
+      posts={displayPosts}
       title={`Beasiswa dengan Tag: "${originalTag}"`}
-      initialDisplayPosts={displayPosts as any}
+      initialDisplayPosts={displayPosts}
       tags={allTags}
       // Pagination bisa ditambahkan di sini nanti jika diperlukan
     />

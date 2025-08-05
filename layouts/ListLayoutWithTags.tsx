@@ -7,7 +7,15 @@ import { formatDate } from 'pliny/utils/formatDate'
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
-import type { Beasiswa } from '@/lib/db/constants' // <-- Impor tipe data Beasiswa
+import type { Beasiswa } from '@/lib/db/constant' // <-- Impor tipe data Beasiswa
+
+// Interface untuk data yang sudah ditransformasi
+interface TransformedBeasiswa extends Beasiswa {
+  path: string
+  date: string
+  title: string
+  summary: string
+}
 
 // Props untuk komponen Pagination (tidak berubah)
 interface PaginationProps {
@@ -17,9 +25,9 @@ interface PaginationProps {
 
 // ✅ 1. UBAH PROPS AGAR MENERIMA DATA BEASISWA DAN TAGS DINAMIS
 interface ListLayoutProps {
-  posts: Beasiswa[] // Terima array Beasiswa
+  posts: TransformedBeasiswa[] // Terima array Beasiswa yang sudah ditransformasi
   title: string
-  initialDisplayPosts?: Beasiswa[]
+  initialDisplayPosts?: TransformedBeasiswa[]
   pagination?: PaginationProps
   tags: Record<string, number> // Terima objek tags dari database
 }
