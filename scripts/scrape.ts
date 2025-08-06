@@ -1,5 +1,5 @@
-import { createBeasiswaCrawler } from '../lib/crawler/crawler.js'
-import { indbeasiswaConfig, beasiswakitaConfig } from '../lib/crawler/config.js'
+import { createBeasiswaCrawler } from '@/lib/crawler/crawler'
+import { indbeasiswaConfig, beasiswakitaConfig } from '@/lib/crawler/config'
 
 async function main() {
   console.log('🚀 Memulai proses crawling...')

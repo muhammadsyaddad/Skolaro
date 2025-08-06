@@ -36,7 +36,6 @@ export interface ScraperConfig {
 
 // Konfigurasi untuk situs pertama (indbeasiswa.com)
 export const indbeasiswaConfig: ScraperConfig = {
-  // sourceName: "indbeasiswa", <-- Dihapus
   url: 'https://indbeasiswa.com/beasiswa-unggulan/',
   globs: ['https://indbeasiswa.com/beasiswa-*'],
   maxRequestsPerCrawl: 300,
@@ -44,7 +43,6 @@ export const indbeasiswaConfig: ScraperConfig = {
   titleSelector: 'h1.post-title',
   tagsSelector: 'span.post-category a',
   extractData: ($, content) => {
-    // 'content' sekarang diterima
     const info: Partial<Beasiswa> = {
       persyaratan: [],
       benefit: [],

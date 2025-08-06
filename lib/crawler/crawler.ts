@@ -8,8 +8,40 @@ export function createBeasiswaCrawler(config: ScraperConfig, sourceName: string)
   // Tambahkan sourceName di sini
   return new PlaywrightCrawler({
     maxRequestsPerCrawl: config.maxRequestsPerCrawl ?? 300,
-    navigationTimeoutSecs: 120000, // Tambahkan timeout yang lebih lama
+    navigationTimeoutSecs: 120000,
+    preNavigationHooks: [
+      async (crawlingContext) => {
+        const { request, log } = crawlingContext
+
+        // 1. Cek apakah URL ini sudah ada di database kita
+        const { data, error } = await supabase
+          .from('beasiswa')
+          .select('url')
+          .eq('url', request.url)
+          .limit(1) // Cukup cari 1, jika ada berarti sudah ada
+          .single() // .single() lebih efisien jika kita hanya expect 1 atau 0 hasil
+
+        // Jika terjadi error saat query, kita log dan lewati saja (anggap belum ada)
+        // Kita tidak ingin error database menghentikan seluruh proses crawl
+        if (error && error.code !== 'PGRST116') {
+          // Abaikan error 'not found'
+          log.error(`[Supabase Check] Error saat memeriksa URL ${request.url}: ${error.message}`)
+          return
+        }
+
+        // 2. Jika URL sudah ditemukan di database (data tidak null)
+        if (data) {
+          log.info(`[DUPLICATE] URL sudah ada di DB, skip navigasi: ${request.url}`)
+          // 3. Tandai request ini agar tidak dilanjutkan ke requestHandler
+          crawlingContext.request.skipNavigation = true
+        }
+      },
+    ],
+    // Tambahkan timeout yang lebih lama
     async requestHandler({ page, parseWithCheerio, request, enqueueLinks }: any) {
+      if (request.skipNavigation) {
+        return
+      }
       try {
         console.log(`[${sourceName}] 🤖 Mengunjungi: ${request.url}`)
         await page.waitForSelector(config.contentSelector, { timeout: 30000 })
