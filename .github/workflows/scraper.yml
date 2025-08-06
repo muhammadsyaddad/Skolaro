@@ -7,7 +7,7 @@ on:
   # "0 */6 * * *" artinya: pada menit ke-0, setiap 6 jam.
   # Anda bisa mengubahnya di https://crontab.guru/
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 0 */3 * *'
 
   # Menambahkan tombol "Run workflow" di tab Actions.
   # Ini sangat berguna untuk melakukan testing tanpa harus menunggu jadwal.
