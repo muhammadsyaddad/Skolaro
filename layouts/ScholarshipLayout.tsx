@@ -57,18 +57,15 @@ export default function ScholarshipLayout({ beasiswa }: LayoutProps) {
                   </div>
                 )}
                 <div className="py-4 xl:py-8">
-                  {/*<Link
-                    href={link_pendaftaran!}
-                    className="bg-primary-500 hover:bg-primary-600 w-full rounded-md px-4 py-2 text-center font-medium text-white"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Kunjungi Pendaftaran
-                  </Link>*/}
                   <Link
-                    href={link_pendaftaran!}
+                    href={
+                      link_pendaftaran ??
+                      `https://www.google.com/search?q=${encodeURIComponent(judul + ' beasiswa')}`
+                    }
                     className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
                     aria-label="Semua beasiswa"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Link Pendaftaran &rarr;
                   </Link>
@@ -79,11 +76,15 @@ export default function ScholarshipLayout({ beasiswa }: LayoutProps) {
             <div className="divide-y divide-gray-200 xl:col-span-3 xl:row-span-2 xl:pb-0 dark:divide-gray-700">
               <div className="prose dark:prose-invert max-w-none pt-10 pb-8">
                 {/* Kita render setiap bagian di sini */}
-                <h2>Deskripsi</h2>
-                {deskripsi.map((paragraf, index) => (
-                  <p key={`desc-${index}`}>{paragraf}</p>
-                ))}
 
+                {deskripsi.length > 5 && (
+                  <>
+                    <h2>Deskripsi</h2>
+                    {deskripsi.map((paragraf, index) => (
+                      <p key={`desc-${index}`}>{paragraf}</p>
+                    ))}
+                  </>
+                )}
                 <h2>Persyaratan</h2>
                 <ul>
                   {persyaratan.map((syarat, index) => (
@@ -97,13 +98,14 @@ export default function ScholarshipLayout({ beasiswa }: LayoutProps) {
                     <li key={`ben-${index}`}>{item}</li>
                   ))}
                 </ul>
-
-                <h2>Kampus Mitra</h2>
-                <ul>
-                  {kampus.map((item, index) => (
-                    <li key={`kampus-${index}`}>{item}</li>
-                  ))}
-                </ul>
+                {kampus.length > 5 && (
+                  <>
+                    <h2>Kampus Mitra</h2>
+                    {kampus.map((item, index) => (
+                      <p key={`desc-${index}`}>{item}</p>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
 
