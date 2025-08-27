@@ -1,6 +1,6 @@
 # Skolaro - Scholarship Information Platform
 
-![Skolaro Screenshot](https://skolaro.vercel.app/static/images/twitter-card.png)
+![Skolaro Screenshot](https://skolaro.vercel.app/static/images/logo.png)
 
 **Skolaro** is a web platform designed to simplify the process of finding scholarship information. This project aggregates scholarship data from various sources, presenting it in a clean, fast, and user-friendly interface.
 
