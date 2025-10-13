@@ -4,6 +4,8 @@ import ListLayoutWithTags from '@/layouts/ListLayoutWithTags'
 import { getBeasiswa, getAllTagsWithCounts, BEASISWA_PER_HALAMAN } from '@/lib/db/data'
 import type { Beasiswa } from '@/lib/db/constant'
 
+export const dynamic = 'force-dynamic'
+
 const JUDUL_HALAMAN = 'Semua Beasiswa'
 
 interface TransformedBeasiswa extends Beasiswa {
