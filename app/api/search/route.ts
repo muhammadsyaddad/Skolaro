@@ -3,6 +3,8 @@
 import { NextResponse } from 'next/server'
 import { getBeasiswaForSearch } from '@/lib/db/data'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const searchIndex = await getBeasiswaForSearch()

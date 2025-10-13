@@ -7,6 +7,8 @@ import { getAllTagsWithCounts } from '@/lib/db/data' // Ambil data dari database
 import { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 
+export const dynamic = 'force-dynamic'
+
 // SEO untuk halaman
 export const metadata: Metadata = {
   title: 'Tags',

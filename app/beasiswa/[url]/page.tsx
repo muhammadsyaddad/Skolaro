@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation'
 import { getBeasiswaByUrl } from '@/lib/db/data'
 import ScholarshipLayout from '@/layouts/ScholarshipLayout'
 
+export const dynamic = 'force-dynamic'
+
 // Definisikan tipe props di sini agar jelas
 interface BeasiswaDetailPageProps {
   params: Promise<{

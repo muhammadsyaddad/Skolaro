@@ -5,6 +5,8 @@ import { getAllTagsWithCounts, getBeasiswaByTag } from '@/lib/db/data'
 
 import type { Beasiswa } from '@/lib/db/constant'
 
+export const dynamic = 'force-dynamic'
+
 const BEASISWA_PER_HALAMAN = 5
 
 interface TransformedBeasiswa extends Beasiswa {

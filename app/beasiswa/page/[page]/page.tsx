@@ -4,6 +4,8 @@ import ListLayoutWithTags from '@/layouts/ListLayoutWithTags'
 import { getBeasiswa, BEASISWA_PER_HALAMAN, getAllTagsWithCounts } from '@/lib/db/data' // <-- Tambahkan getAllTagsWithCounts
 import type { Beasiswa } from '@/lib/db/constant'
 
+export const dynamic = 'force-dynamic'
+
 const JUDUL_HALAMAN = 'Semua Beasiswa'
 
 interface PageProps {

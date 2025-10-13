@@ -9,6 +9,8 @@ import { getAllTagsWithCounts, getBeasiswaByTag } from '@/lib/db/data'
 
 import type { Beasiswa } from '@/lib/db/constant'
 
+export const dynamic = 'force-dynamic'
+
 // Props untuk halaman ini
 interface TagPageProps {
   params: Promise<{

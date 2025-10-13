@@ -1,6 +1,8 @@
 import { getBeasiswa } from '@/lib/db/data'
 import Main from './Main'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
   // Ambil data halaman pertama dari fungsi yang kita buat
   const { data: beasiswa } = await getBeasiswa(1)
